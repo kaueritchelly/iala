@@ -50,7 +50,7 @@ footer{text-align:center;color:var(--ink2);font-size:14px}
     <p>Eu atendo seus clientes no WhatsApp, anoto o pedido sem errar e nunca deixo ninguém no vácuo, nem na sexta às 20h30 com a casa lotada.</p>
     <div class="row">
       <button class="btn p" id="ouvir">▶ Ouvir minha apresentação</button>
-      <a class="btn s" id="ligar" href="#falar">📞 Falar comigo</a>
+      <button class="btn s" id="ligar">📞 Ligar para a IalA</button>
     </div>
   </div>
   <img src="avatar.png" alt="IalA, a atendente de IA, de capacete laranja de astronauta">
@@ -97,7 +97,7 @@ footer{text-align:center;color:var(--ink2);font-size:14px}
 
 <script>
 // ===== CONFIGURE AQUI =====
-const PHONE = "";        // ex: "+5511999999999". Vazio = rola até o chat.
+const API = "";          // ex: "https://SUA-API.onrender.com/v1". Vazio = ligação desativada.
 const WHATSAPP = "";     // ex: "5511999999999". Vazio = botão final rola até o chat.
 const CHAT_URL = "";     // POST {messages:[{role,content}]} -> {reply}. Vazio = respostas de demonstração.
 // ==========================
@@ -163,7 +163,63 @@ $("ouvir").onclick = () => { say("Ouvindo minha apresentação… 🎧", "ia"); 
 
 say("Oi! Eu sou a IalA 👋 Pode me perguntar qualquer coisa sobre como eu ajudaria a sua pizzaria. Escreve ou clica no microfone.", "ia");
 
-if (PHONE) $("ligar").href = "tel:" + PHONE;
+// ===== Ligação por voz ao vivo (Grok Voice, mesma técnica do painel Tinner) =====
+const RATE = 24000;
+const WORKLET = `class P extends AudioWorkletProcessor{constructor(){super();this.b=[];this.n=0}process(i){const c=i[0][0];if(c){this.b.push(new Float32Array(c));this.n+=c.length;if(this.n>=2400){const o=new Int16Array(this.n);let k=0;for(const a of this.b)for(let j=0;j<a.length;j++){o[k++]=Math.max(-1,Math.min(1,a[j]))*32767}this.port.postMessage(o.buffer,[o.buffer]);this.b=[];this.n=0}}return true}}registerProcessor("pcm",P)`;
+const b64 = buf => { let s = ""; const u = new Uint8Array(buf); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+let call = null;
+
+async function startCall() {
+  const cfg = await (await fetch(API + "/public/iala/voice", { method: "POST" })).json();
+  if (!cfg.token) throw new Error(cfg.message || "sem token");
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+  const ctx = new AudioContext({ sampleRate: RATE }); await ctx.resume();
+  const out = ctx.createGain(); out.gain.value = 1.6; out.connect(ctx.destination);
+  const url = URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" }));
+  await ctx.audioWorklet.addModule(url); URL.revokeObjectURL(url);
+  const node = new AudioWorkletNode(ctx, "pcm"); ctx.createMediaStreamSource(stream).connect(node);
+  const ws = new WebSocket("wss://api.x.ai/v1/realtime?model=" + encodeURIComponent(cfg.model), ["xai-client-secret." + cfg.token]);
+  const playing = new Set(); let next = 0, text = "", bubble = null;
+  const send = o => ws.readyState === 1 && ws.send(JSON.stringify(o));
+  const stopAudio = () => { playing.forEach(s => { try { s.stop(); } catch {} }); playing.clear(); next = 0; };
+  node.port.onmessage = e => send({ type: "input_audio_buffer.append", audio: b64(e.data) });
+  const play = b => {
+    const raw = atob(b), pcm = new Int16Array(raw.length / 2);
+    for (let i = 0; i < pcm.length; i++) pcm[i] = ((raw.charCodeAt(2 * i) | (raw.charCodeAt(2 * i + 1) << 8)) << 16) >> 16;
+    const buf = ctx.createBuffer(1, pcm.length, RATE), ch = buf.getChannelData(0);
+    for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768;
+    const s = ctx.createBufferSource(); s.buffer = buf; s.connect(out);
+    next = Math.max(next, ctx.currentTime + 0.02); s.start(next); next += buf.duration;
+    playing.add(s); s.onended = () => playing.delete(s);
+  };
+  ws.onopen = () => {
+    send({ type: "session.update", session: { voice: cfg.voice, instructions: cfg.instructions, turn_detection: { type: "server_vad" },
+      audio: { input: { format: { type: "audio/pcm", rate: RATE }, transcription: { model: "grok-transcribe", language_hint: "pt" } }, output: { format: { type: "audio/pcm", rate: RATE } } } } });
+    send({ type: "response.create" }); // a IalA atende e se apresenta
+  };
+  ws.onmessage = ev => {
+    const m = JSON.parse(ev.data);
+    if (m.type === "input_audio_buffer.speech_started") stopAudio();
+    else if (m.type === "conversation.item.input_audio_transcription.completed") { const t = String(m.transcript ?? m.text ?? "").trim(); if (t) say(t, "me"); }
+    else if (m.type === "response.output_audio.delta" || m.type === "response.audio.delta") play(String(m.delta));
+    else if (m.type === "response.output_audio_transcript.delta") { text += m.delta ?? ""; if (!bubble) { say("", "ia"); bubble = log.lastChild; } bubble.textContent = text; log.scrollTop = 1e9; }
+    else if (m.type === "response.output_audio_transcript.done") { text = ""; bubble = null; }
+    else if (m.type === "error") { say("A ligação caiu. Tenta de novo?", "ia"); hang(); }
+  };
+  ws.onclose = () => hang();
+  const timer = setTimeout(hang, cfg.maxSeconds * 1000);
+  call = { stop() { clearTimeout(timer); try { ws.close(); } catch {} stopAudio(); stream.getTracks().forEach(t => t.stop()); void ctx.close(); } };
+}
+function hang() { if (!call) return; call.stop(); call = null; $("ligar").textContent = "📞 Ligar para a IalA"; }
+
+$("ligar").onclick = async () => {
+  location.hash = "falar";
+  if (call) return hang();
+  if (!API) return say("A ligação por voz ainda não está ativada nesta página. Por enquanto, me escreve aqui!", "ia");
+  speechSynthesis.cancel(); $("ligar").textContent = "Conectando…";
+  try { await startCall(); $("ligar").textContent = "🔴 Desligar"; }
+  catch (e) { call = null; $("ligar").textContent = "📞 Ligar para a IalA"; say(e.name === "NotAllowedError" ? "Preciso do microfone liberado pra gente conversar." : "Não consegui ligar agora. Tenta de novo em instantes?", "ia"); }
+};
 if (WHATSAPP) $("zap").href = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent("Oi! Quero a IalA na minha pizzaria.");
 else $("zap").href = "#falar";
 </script>
