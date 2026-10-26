@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IalA, atendente de IA para pizzarias</title>
+<meta name="description" content="Oi, eu sou a IalA. Atendo seus clientes no WhatsApp 24h, anoto pedidos sem erro e nunca deixo uma pizza sem resposta. Fale comigo.">
+<style>
+:root{--bg:#fffaf5;--surface:#fff;--ink:#1d1410;--ink2:#5c4b40;--line:#f0e2d6;--brand:#f26a1b;--brand-h:#d9560c;--soft:#fff0e4;--ok:#1f9d55}
+@media (prefers-color-scheme:dark){:root{--bg:#150f0b;--surface:#201812;--ink:#fbf3ec;--ink2:#c9b7a8;--line:#3a2c22;--soft:#33200f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,"Geist",sans-serif}
+main{max-width:880px;margin:0 auto;padding:0 16px 80px}
+section{padding:48px 0}
+h1{font-size:clamp(34px,7vw,56px);line-height:1.05;margin:0 0 16px;letter-spacing:-.02em}
+h2{font-size:28px;margin:0 0 20px;letter-spacing:-.01em}
+p{color:var(--ink2);margin:0 0 12px}
+.hero{display:grid;gap:32px;align-items:center;padding-top:40px}
+@media(min-width:720px){.hero{grid-template-columns:1fr 280px}}
+.hero img{width:100%;max-width:280px;border-radius:28px;border:1px solid var(--line);background:var(--soft);justify-self:center}
+.tag{display:inline-block;background:var(--soft);color:var(--brand-h);padding:4px 12px;border-radius:20px;font-size:14px;font-weight:600;margin-bottom:16px}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.btn{border:0;border-radius:10px;padding:14px 20px;font:600 16px inherit;font-family:inherit;cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+.btn.p{background:var(--brand);color:#fff}.btn.p:hover{background:var(--brand-h)}
+.btn.s{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.grid{display:grid;gap:16px}
+@media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{margin:0 0 6px;font-size:18px}.card p{margin:0}
+.chat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+#log{height:320px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:4px}
+.m{max-width:85%;padding:10px 14px;border-radius:14px;white-space:pre-wrap}
+.m.ia{background:var(--soft);align-self:flex-start}
+.m.me{background:var(--brand);color:#fff;align-self:flex-end}
+form{display:flex;gap:8px;margin-top:12px}
+input{flex:1;min-width:0;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chips button{background:none;border:1px solid var(--line);color:var(--ink2);border-radius:20px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}
+footer{text-align:center;color:var(--ink2);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+
+<section class="hero">
+  <div>
+    <span class="tag">✦ Atendente de IA para pizzarias</span>
+    <h1>Oi, eu sou a IalA. Me contrata pra sua pizzaria.</h1>
+    <p>Eu atendo seus clientes no WhatsApp, anoto o pedido sem errar e nunca deixo ninguém no vácuo, nem na sexta às 20h30 com a casa lotada.</p>
+    <div class="row">
+      <button class="btn p" id="ouvir">▶ Ouvir minha apresentação</button>
+      <a class="btn s" id="ligar" href="#falar">📞 Falar comigo</a>
+    </div>
+  </div>
+  <img src="avatar.png" alt="IalA, a atendente de IA, de capacete laranja de astronauta">
+</section>
+
+<section>
+  <h2>Por que me contratar</h2>
+  <div class="grid">
+    <div class="card"><h3>Atendo 24 horas</h3><p>Não tiro folga, não fico doente e não demoro pra responder. Cliente com fome não espera.</p></div>
+    <div class="card"><h3>Vários clientes ao mesmo tempo</h3><p>No pico, 1 ou 50 conversas é igual pra mim. Ninguém mais desiste porque ninguém atendeu.</p></div>
+    <div class="card"><h3>Pedido certo, de primeira</h3><p>Sabor, borda, metade a metade, endereço e forma de pagamento. Confirmo tudo com o cliente antes de mandar pra cozinha.</p></div>
+    <div class="card"><h3>Vendo mais, sem forçar</h3><p>Sugiro a bebida, a sobremesa e a borda recheada na hora certa. Ticket médio maior, sem ninguém se sentir empurrado.</p></div>
+    <div class="card"><h3>Conheço seu cardápio de cor</h3><p>Preços, ingredientes, alergias, tempo de entrega e taxa por bairro. Respondo igual ao seu melhor atendente, todo dia.</p></div>
+    <div class="card"><h3>Você manda, eu obedeço</h3><p>Tudo que faço fica registrado e dá pra desfazer. O que envolve dinheiro, preço ou cliente passa pela sua aprovação.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Eu não substituo sua equipe. Eu tiro o peso dela.</h2>
+  <p>Seu pessoal para de ficar preso ao celular e volta a fazer o que importa: pizza boa e cliente bem tratado. Eu cuido da fila de mensagens, e quando aparece algo delicado, chamo um humano.</p>
+</section>
+
+<section id="falar">
+  <h2>Quer testar? Fala comigo.</h2>
+  <div class="chat">
+    <div id="log" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <form id="f">
+      <input id="q" placeholder="Pergunte qualquer coisa…" autocomplete="off" aria-label="Sua mensagem">
+      <button class="btn s" type="button" id="mic" title="Falar" aria-label="Falar com a voz">🎙</button>
+      <button class="btn p">Enviar</button>
+    </form>
+  </div>
+</section>
+
+<section>
+  <h2>Vamos conversar sobre a sua pizzaria?</h2>
+  <p>Me coloca pra trabalhar. Em pouco tempo eu já estou atendendo.</p>
+  <div class="row"><a class="btn p" id="zap" href="#">Quero a IalA na minha pizzaria</a></div>
+</section>
+
+<footer>IalA · agente de IA da Tinner</footer>
+</main>
+
+<script>
+// ===== CONFIGURE AQUI =====
+const PHONE = "";        // ex: "+5511999999999". Vazio = rola até o chat.
+const WHATSAPP = "";     // ex: "5511999999999". Vazio = botão final rola até o chat.
+const CHAT_URL = "";     // POST {messages:[{role,content}]} -> {reply}. Vazio = respostas de demonstração.
+// ==========================
+
+const PITCH = "Oi! Eu sou a Iala, a atendente de inteligência artificial da Tinner. Vou te contar rapidinho por que você deve me contratar para a sua pizzaria. Eu atendo seus clientes no WhatsApp vinte e quatro horas por dia. Não tiro folga, não demoro e não perco pedido. No pico, eu converso com vários clientes ao mesmo tempo, então ninguém desiste esperando. Eu conheço o seu cardápio de cor, anoto o pedido certinho, confirmo endereço e pagamento, e ainda sugiro bebida e sobremesa na hora certa, para o seu ticket médio subir. E você continua no controle: tudo que eu faço fica registrado, e o que envolve dinheiro ou preço passa pela sua aprovação. Eu não vim substituir a sua equipe. Vim tirar o peso dela. Que tal me testar agora? É só falar comigo aqui na página.";
+
+const DEMO = [
+  [/pre[çc]o|custa|valor|quanto/, "Os preços eu pego direto do seu cardápio, então estão sempre atualizados. E se você mudar um valor, eu já respondo com o novo na hora."],
+  [/erro|errad|engan/, "Eu repito o pedido inteiro pro cliente confirmar antes de mandar pra cozinha: sabor, borda, endereço e pagamento. Isso corta quase todo erro de anotação."],
+  [/noite|madrugada|hor[aá]rio|24/, "Atendo 24 horas, todos os dias. Fora do horário, eu aviso quando a casa abre e já deixo o pedido agendado."],
+  [/subst|demit|funcion|equipe/, "Não vim tirar o emprego de ninguém. Eu cuido da fila de mensagens e chamo um humano quando o assunto é delicado, tipo reclamação."],
+  [/vend|ticket|lucro|mais/, "Na hora do pedido eu sugiro a bebida, a borda recheada ou a sobremesa. Sem insistir, só no momento certo. É venda extra todo dia, sem esforço."],
+  [/contrat|come[çc]|como|implant/, "É simples: você me passa seu cardápio e as regras da casa, eu aprendo e começo a atender. Clica em 'Quero a IalA' lá embaixo que a gente conversa."],
+];
+const FALLBACK = "Boa pergunta! Pra te responder direito, o ideal é a gente conversar com calma. Clica em 'Quero a IalA na minha pizzaria' que um humano da Tinner te chama.";
+
+const $ = id => document.getElementById(id);
+const log = $("log"), hist = [];
+const say = (t, who) => { const d = document.createElement("div"); d.className = "m " + who; d.textContent = t; log.append(d); log.scrollTop = 1e9; };
+
+async function reply(text) {
+  hist.push({ role: "user", content: text });
+  let r;
+  if (CHAT_URL) {
+    try { r = (await (await fetch(CHAT_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: hist }) })).json()).reply; } catch {}
+  } else {
+    r = (DEMO.find(([re]) => re.test(text.toLowerCase())) || [, FALLBACK])[1];
+  }
+  r ||= "Ops, tive um probleminha aqui. Tenta de novo?";
+  hist.push({ role: "assistant", content: r });
+  say(r, "ia");
+  return r;
+}
+
+function speak(t) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t); u.lang = "pt-BR"; u.rate = 1.05;
+  speechSynthesis.speak(u);
+}
+
+$("f").onsubmit = async e => {
+  e.preventDefault();
+  const t = $("q").value.trim(); if (!t) return;
+  $("q").value = ""; say(t, "me"); speak(await reply(t));
+};
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR) {
+  $("mic").onclick = () => {
+    const s = new SR(); s.lang = "pt-BR";
+    s.onresult = e => { $("q").value = e.results[0][0].transcript; $("f").requestSubmit(); };
+    s.start();
+  };
+} else $("mic").hidden = true;
+
+$("ouvir").onclick = () => { say("Ouvindo minha apresentação… 🎧", "ia"); speak(PITCH); };
+
+[["Quanto custa?"], ["E se errar o pedido?"], ["Vai substituir minha equipe?"], ["Como eu começo?"]].forEach(([t]) => {
+  const b = document.createElement("button"); b.type = "button"; b.textContent = t;
+  b.onclick = () => { $("q").value = t; $("f").requestSubmit(); };
+  $("chips").append(b);
+});
+
+say("Oi! Eu sou a IalA 👋 Pode me perguntar qualquer coisa sobre como eu ajudaria a sua pizzaria. Escreve ou clica no microfone.", "ia");
+
+if (PHONE) $("ligar").href = "tel:" + PHONE;
+if (WHATSAPP) $("zap").href = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent("Oi! Quero a IalA na minha pizzaria.");
+else $("zap").href = "#falar";
+</script>
+</body>
+</html>
